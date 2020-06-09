@@ -36,13 +36,13 @@ def user_register():
             'last_name': form.last_name.data
         }
 
-        user = User.register(**form_values)
-        db.session.add(user)
-        db.session.commit()
-        return redirect('/secret')
-    else:
-        return render_template('register.html', form=form)
+        if User.query.filter_by(username=form_values['username']).count() == 0:
+            user = User.register(**form_values)
+            db.session.add(user)
+            db.session.commit()
+            return redirect('/secret')
 
+    return render_template('register.html', form=form)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -58,8 +58,9 @@ def login():
         user = User.authenticate(username, password)
 
         if user:
+            # could save whole user in session if we want
             session["user_id"] = user.id  # keep logged in
-            return redirect("/secret")
+            return redirect(f"/users/{user.username}")
 
         else:
             form.username.errors = ["Bad name/password"]
@@ -75,3 +76,25 @@ def secret():
         return redirect("/login")
     else:
         return render_template("secret.html")
+
+@app.route("/logout")
+def log_out():
+    """Log out a user """
+
+    session.pop("user_id")
+
+    return redirect("/")
+
+@app.route("/users/<string:username>")
+def show_user_page(username):
+    """Show a user's profile"""
+
+    if "user_id" not in session:
+        return redirect("/login")
+
+    else:
+        user = User.query.filter(User.username == username).first()
+        if user.username == username:
+            return render_template("user.html", user=user)
+    
+        return redirect("/users/<string:username>")
