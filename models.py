@@ -32,8 +32,8 @@ class User(db.Model):
                            nullable=False)
     last_name = db.Column(db.String(30),
                           nullable=False)
-    
-    reviews = db.relationship('Feedback')
+
+    reviews = db.relationship('Review')
 
     @classmethod
     def register(cls, **kwargs):
@@ -62,8 +62,9 @@ class User(db.Model):
         else:
             return False
 
-class Feedback(db.Model):
-    """Feedback"""
+
+class Review(db.Model):
+    """Review (aka Feedback)"""
 
     __tablename__ = "reviews"
 
@@ -71,11 +72,10 @@ class Feedback(db.Model):
                    primary_key=True,
                    autoincrement=True)
 
-    title = db.Column(db.String(100),
-                         nullabe=False)
-    content = db.Column(db.Text,
-                         nullable=False)
-    user_id = db.Column(db.Text,
-                      db.ForeignKey('users.id'))
+    title = db.Column(db.String(100), nullable=False)
+    content = db.Column(db.Text(),
+                        nullable=False)
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey('users.id'))
 
     user = db.relationship('User')

@@ -6,4 +6,9 @@
   <p>Username: {{ user.username }}</p>
   <p>Email: {{ user.email }}</p>
 
-  {% endblock %}
+  <ul>
+  {% for review in user.reviews %}
+    <li><a href="/feedback/{{ review.id }}/update">{{ review.title }}</a><a href="/feedback/{{ review.id }}/delete">Delete</a></li>
+  {% endfor %}
+  </ul>
+{% endblock %}
